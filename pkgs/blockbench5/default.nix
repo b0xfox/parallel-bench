@@ -82,8 +82,8 @@ buildNpmPackage rec {
     makeWrapper ${lib.getExe electron} $out/bin/blockbench5 \
       --add-flags $out/share/blockbench5/resources/app.asar \
       --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --enable-wayland-ime=true}}" \
-      --add-flags "--userData=$HOME/.config/Blockbench/${version}" \
-      --inherit-argv0
+      --add-flags "--userData" \
+      --add-flags "\$HOME/.config/Blockbench/${version}" \
   ''
   + ''
     runHook postInstall
