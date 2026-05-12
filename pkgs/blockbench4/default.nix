@@ -13,7 +13,7 @@
 }:
 
 buildNpmPackage rec {
-  pname = "blockbench4";
+  pname = "blockbench";
   version = "4.12.4";
 
   src = fetchFromGitHub {
@@ -60,21 +60,22 @@ buildNpmPackage rec {
     ${lib.optionalString stdenv.hostPlatform.isDarwin ''
       mkdir -p $out/Applications
       cp -r dist/mac*/Blockbench.app $out/Applications
-      makeWrapper $out/Applications/Blockbench.app/Contents/MacOS/Blockbench $out/bin/${pname}
+      makeWrapper $out/Applications/Blockbench.app/Contents/MacOS/Blockbench $out/bin/blockbench4
     ''}
 
     ${lib.optionalString (!stdenv.hostPlatform.isDarwin) ''
-      mkdir -p $out/share/${pname}
-      cp -r dist/*-unpacked/{locales,resources{,.pak}} $out/share/${pname}
+      mkdir -p $out/share/blockbench4
+      cp -r dist/*-unpacked/{locales,resources{,.pak}} $out/share/blockbench4
 
       for size in 16 32 48 64 128 256 512; do
         mkdir -p $out/share/icons/hicolor/"$size"x"$size"/apps
-        magick icon.png -resize "$size"x"$size" $out/share/icons/hicolor/"$size"x"$size"/apps/${pname}.png
+        magick icon.png -resize "$size"x"$size" $out/share/icons/hicolor/"$size"x"$size"/apps/blockbench4.png
       done
 
-      makeWrapper ${lib.getExe electron} $out/bin/${pname} \
-          --add-flags $out/share/${pname}/resources/app.asar \
+      makeWrapper ${lib.getExe electron} $out/bin/blockbench4 \
+          --add-flags $out/share/blockbench4/resources/app.asar \
           --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --enable-wayland-ime=true}}" \
+          --add-flags "--userData=$HOME/.config/Blockbench/${version}" \
           --inherit-argv0
     ''}
 
@@ -84,8 +85,8 @@ buildNpmPackage rec {
   # based on desktop file found in the published AppImage archive
   desktopItems = [
     (makeDesktopItem {
-      name = "${pname}";
-      exec = "${pname} %U";
+      name = "blockbench4";
+      exec = "blockbench4 %U";
       icon = "blockbench";
       desktopName = "Blockbench 4.12.4";
       comment = meta.description;
@@ -100,7 +101,7 @@ buildNpmPackage rec {
     description = "Low-poly 3D modeling and animation software (Version 4.12.4)";
     homepage = "https://blockbench.net/";
     license = lib.licenses.gpl3Only;
-    mainProgram = "${pname}";
+    mainProgram = "blockbench4";
     maintainers = with lib.maintainers; [ tomasajt ];
   };
 }

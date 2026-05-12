@@ -13,7 +13,7 @@
 }:
 
 buildNpmPackage rec {
-  pname = "blockbench5";
+  pname = "blockbench";
   version = "5.1.4";
 
   src = fetchFromGitHub {
@@ -68,20 +68,21 @@ buildNpmPackage rec {
   + lib.optionalString stdenv.hostPlatform.isDarwin ''
     mkdir -p $out/Applications
     cp -r dist-electron/mac*/Blockbench.app $out/Applications
-    makeWrapper $out/Applications/Blockbench.app/Contents/MacOS/Blockbench $out/bin/${pname}
+    makeWrapper $out/Applications/Blockbench.app/Contents/MacOS/Blockbench $out/bin/blockbench5
   ''
   + lib.optionalString (!stdenv.hostPlatform.isDarwin) ''
-    mkdir -p $out/share/${pname}
-    cp -r dist-electron/*-unpacked/{locales,resources{,.pak}} $out/share/${pname}
+    mkdir -p $out/share/blockbench5
+    cp -r dist-electron/*-unpacked/{locales,resources{,.pak}} $out/share/blockbench5
 
     for size in 16 32 48 64 128 256 512; do
       mkdir -p $out/share/icons/hicolor/"$size"x"$size"/apps
-      magick icon.png -resize "$size"x"$size" $out/share/icons/hicolor/"$size"x"$size"/apps/${pname}.png
+      magick icon.png -resize "$size"x"$size" $out/share/icons/hicolor/"$size"x"$size"/apps/blockbench5.png
     done
 
-    makeWrapper ${lib.getExe electron} $out/bin/${pname} \
-      --add-flags $out/share/${pname}/resources/app.asar \
+    makeWrapper ${lib.getExe electron} $out/bin/blockbench5 \
+      --add-flags $out/share/blockbench5/resources/app.asar \
       --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --enable-wayland-ime=true}}" \
+      --add-flags "--userData=$HOME/.config/Blockbench/${version}" \
       --inherit-argv0
   ''
   + ''
@@ -91,9 +92,9 @@ buildNpmPackage rec {
   # based on desktop file found in the published AppImage archive
   desktopItems = [
     (makeDesktopItem {
-      name = "${pname}";
-      exec = "${pname} %U";
-      icon = "${pname}";
+      name = "blockbench5";
+      exec = "blockbench5 %U";
+      icon = "blockbench5";
       desktopName = "Blockbench 5.1.4";
       comment = meta.description;
       categories = [ "3DGraphics" ];
